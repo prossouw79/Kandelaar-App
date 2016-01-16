@@ -1,11 +1,14 @@
 package puk.kandelaar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,9 +18,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.Date;
+
 public class ScrollingActivity extends AppCompatActivity {
     WebView webView;
-    public final String GlobalUrl = "http://www.ngpukkandelaar.co.za";
+    public final String home = "http://www.ngpukkandelaar.co.za";
 
 
     @Override
@@ -47,17 +53,17 @@ public class ScrollingActivity extends AppCompatActivity {
         });
 
         webView = (WebView) findViewById(R.id.webView);
-        loadWebViewLoad(webView);
+        loadWebViewLoad(webView,home);
     }
 
-    private void loadWebViewLoad(WebView webview) {
+    private void loadWebViewLoad(WebView webview,String url) {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
         webview.setWebViewClient(new WebViewClient());
         webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webview.setWebChromeClient(new WebChromeClient());
-        webview.loadUrl(GlobalUrl);
+        webview.loadUrl(url);
     }
 
     @Override
@@ -72,9 +78,46 @@ public class ScrollingActivity extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
+        switch (item.getItemId()) {
 
+            case R.id.nav_Tuis:
+                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/tuis/");
+                break;
+
+            case R.id.nav_Eredienste:
+                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/eredienste/");
+
+                break;
+            case R.id.nav_Uitreike:
+                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/uitreike/");
+
+                break;
+
+            case R.id.nav_Events:
+                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/events/");
+
+                break;
+            case R.id.nav_Kleingroepe:
+                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/kleingroepe/");
+
+                break;
+            case R.id.nav_Eerstejaarskampe:
+                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/eerstejaarskampe/");
+
+                break;
+            case R.id.nav_Inskrywingsvorm:
+                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/inskrywingsvorm/");
+
+                break;
+            case R.id.nav_Kontak_Ons:
+                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/kontak-ons/");
+
+                break;
+
+        }
         return super.onOptionsItemSelected(item);
     }
+
+    
 }
