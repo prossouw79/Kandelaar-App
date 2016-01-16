@@ -1,6 +1,10 @@
 package puk.kandelaar;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewConfigurationCompat;
@@ -18,12 +22,21 @@ import android.widget.Toast;
 
 public class ScrollingActivity extends AppCompatActivity {
     WebView webView;
-    public final String home = "http://www.ngpukkandelaar.co.za";
+    public final String link_tuis = "http://www.ngpukkandelaar.co.za/tuis/";
+    public final String link_eredienste = "http://www.ngpukkandelaar.co.za/eredienste/";
+    public final String link_uitreike = "http://www.ngpukkandelaar.co.za/uitreike/";
+    public final String link_events = "http://www.ngpukkandelaar.co.za/events/";
+    public final String link_kleingroepe = "http://www.ngpukkandelaar.co.za/kleingroepe/";
+    public final String link_eerstejaarskampe = "http://www.ngpukkandelaar.co.za/eerstejaarskampe/";
+    public final String link_inskrywingsvorm = "http://www.ngpukkandelaar.co.za/inskrywingsvorm/";
+    public final String link_kontak_ons = "http://www.ngpukkandelaar.co.za/kontak-ons/";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         boolean hasHarwareMenu = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(getApplicationContext()));
@@ -40,27 +53,53 @@ public class ScrollingActivity extends AppCompatActivity {
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
-               /* Snackbar.make(view, "Dankie dat jy hierdie app versprei!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
-
                 Toast.makeText(getBaseContext(), "Dankie dat jy hierdie app versprei!",
                         Toast.LENGTH_LONG).show();
             }
         });
 
         webView = (WebView) findViewById(R.id.webView);
-        loadWebViewLoad(webView,home);
+        loadWebViewLoad(webView, link_tuis);
     }
 
-    private void loadWebViewLoad(WebView webview,String url) {
+    private void loadWebViewLoad(WebView webview,String url)
+    {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
-        webview.setWebViewClient(new WebViewClient());
-        webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webview.setWebChromeClient(new WebChromeClient());
+
+        if (!isNetworkAvailable()) {
+            webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            Toast.makeText(getBaseContext(), "Geen internet konneksie!\nDie app hardloop (nog) nie op genade nie!",
+                    Toast.LENGTH_LONG).show();
+        } else {
+
+            webview.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        }
+        webView.setWebViewClient(new WebViewClient()
+        {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+
+                return true;
+            }
+            @Override
+            public void onPageFinished(WebView view, final String url)
+            {
+
+            }
+        });
+
         webview.loadUrl(url);
+}
+
+    boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,47 +111,26 @@ public class ScrollingActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
+        String tmpLink = link_tuis;
         switch (item.getItemId()) {
-
             case R.id.nav_Tuis:
-                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/tuis/");
-                break;
-
+                tmpLink = link_tuis;            break;
             case R.id.nav_Eredienste:
-                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/eredienste/");
-
-                break;
+                tmpLink =  link_eredienste;     break;
             case R.id.nav_Uitreike:
-                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/uitreike/");
-
-                break;
-
+                tmpLink = link_uitreike;        break;
             case R.id.nav_Events:
-                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/events/");
-
-                break;
+                tmpLink = link_events;          break;
             case R.id.nav_Kleingroepe:
-                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/kleingroepe/");
-
-                break;
+                tmpLink =  link_kleingroepe;    break;
             case R.id.nav_Eerstejaarskampe:
-                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/eerstejaarskampe/");
-
-                break;
+                tmpLink = link_eerstejaarskampe;break;
             case R.id.nav_Inskrywingsvorm:
-                loadWebViewLoad(webView, "http://www.ngpukkandelaar.co.za/inskrywingsvorm/");
-
-                break;
+                tmpLink =  link_inskrywingsvorm;break;
             case R.id.nav_Kontak_Ons:
-                loadWebViewLoad(webView,"http://www.ngpukkandelaar.co.za/kontak-ons/");
-
-                break;
-
+                tmpLink = link_kontak_ons;      break;
         }
+        loadWebViewLoad(webView,tmpLink);
         return super.onOptionsItemSelected(item);
     }
 
