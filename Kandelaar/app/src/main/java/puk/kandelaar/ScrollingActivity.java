@@ -2,10 +2,12 @@ package puk.kandelaar;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.renderscript.Script;
 import android.support.design.widget.FloatingActionButton;
@@ -37,7 +39,8 @@ public class ScrollingActivity extends AppCompatActivity {
     public final String link_inskrywingsvorm = "http://www.ngpukkandelaar.co.za/inskrywingsvorm/";
     public final String link_kontak_ons = "http://www.ngpukkandelaar.co.za/kontak-ons/";
 
-
+    public final String link_ext_youtube = "https://www.youtube.com/user/PukkeKandelaar";
+    public final String link_ext_facebook = "https://www.facebook.com/PUK-Kandelaar-336930246395625/timeline/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +200,7 @@ public class ScrollingActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String tmpLink = link_tuis;
+        String currentUrl = webView.getUrl();
         switch (item.getItemId()) {
             case R.id.nav_Tuis:
                 tmpLink = link_tuis;            break;
@@ -216,10 +220,46 @@ public class ScrollingActivity extends AppCompatActivity {
                 tmpLink =  link_inskrywingsvorm;break;
             case R.id.nav_Kontak_Ons:
                 tmpLink = link_kontak_ons;      break;
+            case R.id.nav_Youtube: {
+                Intent intent=null;
+                try {
+                    intent =new Intent(Intent.ACTION_VIEW);
+                    intent.setPackage("com.google.android.youtube");
+                    intent.setData(Uri.parse(link_ext_youtube));
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(link_ext_youtube));
+                    startActivity(intent);
+                }
+            }
+
+          /*  case R.id.nav_Facebook: {
+                Intent intent=null;
+                try {
+                    intent =new Intent(Intent.ACTION_VIEW);
+                    intent.setPackage("com.google.android.youtube");
+                    intent.setData(Uri.parse(link_ext_youtube));
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(link_ext_youtube));
+                    startActivity(intent);
+                }
+            }*/
         }
-        loadWebViewLoad(webView,tmpLink);
+        if(tmpLink!=currentUrl)
+            loadWebViewLoad(webView,tmpLink);
         return super.onOptionsItemSelected(item);
     }
 
-    
+   /* public static Intent getOpenFacebookIntent(Context context) {
+
+        try {
+            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/<id_here>"));
+        } catch (Exception e) {
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/<user_name_here>"));
+        }
+    }*/
 }

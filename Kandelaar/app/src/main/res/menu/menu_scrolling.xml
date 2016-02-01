@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="puk.kandelaar.ScrollingActivity">
 
-
     <item
         android:id="@+id/nav_Tuis"
         android:showAsAction="always"
@@ -48,5 +47,13 @@
         android:showAsAction="always"
         android:title="Kontak Ons"/>
 
+    <item
+        android:id="@+id/nav_Youtube"
+        android:showAsAction="always"
+        android:title="Youtube Channel"/>
+
+
 
 </menu>
+
+
