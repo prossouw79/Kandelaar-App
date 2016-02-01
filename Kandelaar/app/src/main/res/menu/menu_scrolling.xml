@@ -28,6 +28,10 @@
         android:id="@+id/nav_Kleingroepe"
         android:showAsAction="always"
         android:title="Kleingroepe"/>
+    <item
+        android:id="@+id/nav_Warm_gesprekke"
+        android:showAsAction="always"
+        android:title="Warm Gesprekke"/>
 
     <item
         android:id="@+id/nav_Eerstejaarskampe"

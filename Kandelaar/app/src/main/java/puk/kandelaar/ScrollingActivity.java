@@ -29,6 +29,7 @@ public class ScrollingActivity extends AppCompatActivity {
     public final String link_uitreike = "http://www.ngpukkandelaar.co.za/uitreike/";
     public final String link_events = "http://www.ngpukkandelaar.co.za/events/";
     public final String link_kleingroepe = "http://www.ngpukkandelaar.co.za/kleingroepe/";
+    public final String link_warm_gesprekke = "http://www.ngpukkandelaar.co.za/warm-gesprekke/";
     public final String link_eerstejaarskampe = "http://www.ngpukkandelaar.co.za/eerstejaarskampe/";
     public final String link_inskrywingsvorm = "http://www.ngpukkandelaar.co.za/inskrywingsvorm/";
     public final String link_kontak_ons = "http://www.ngpukkandelaar.co.za/kontak-ons/";
@@ -89,7 +90,6 @@ public class ScrollingActivity extends AppCompatActivity {
         }
         else {
             loadWebViewLoad(webView, link_tuis);
-
             Toast.makeText(getBaseContext(), "Druk nog 'n keer om die app toe te maak.",
                     Toast.LENGTH_LONG).show();
         }
@@ -97,6 +97,19 @@ public class ScrollingActivity extends AppCompatActivity {
 
     private void loadWebViewLoad(WebView webview,String url)
     {
+        switch (url) {
+            case link_tuis : {Toast.makeText(getBaseContext(), "Tuis",Toast.LENGTH_SHORT).show(); break;}
+            case link_eredienste : {Toast.makeText(getBaseContext(), "Eredienste",Toast.LENGTH_SHORT).show(); break;}
+            case link_uitreike : {Toast.makeText(getBaseContext(), "Uitreike",Toast.LENGTH_SHORT).show(); break;}
+            case link_events : {Toast.makeText(getBaseContext(), "Events",Toast.LENGTH_SHORT).show(); break;}
+            case link_kleingroepe : {Toast.makeText(getBaseContext(), "Kleingroepe",Toast.LENGTH_SHORT).show(); break;}
+            case link_warm_gesprekke : {Toast.makeText(getBaseContext(), "Warm Gesprekke",Toast.LENGTH_SHORT).show(); break;}
+            case link_eerstejaarskampe : {Toast.makeText(getBaseContext(), "Eerstejaars Kampe",Toast.LENGTH_SHORT).show(); break;}
+            case link_kontak_ons : {Toast.makeText(getBaseContext(), "Kontak Ons",Toast.LENGTH_SHORT).show(); break;}
+
+        }
+
+
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
@@ -105,12 +118,11 @@ public class ScrollingActivity extends AppCompatActivity {
             webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
             Toast.makeText(getBaseContext(), "Geen internet konneksie!\nDie app hardloop (nog) nie op genade nie!",
                     Toast.LENGTH_LONG).show();
-        } else {
-
+        } else
+        {
             webview.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         }
-        webView.setWebViewClient(new WebViewClient()
-        {
+        webView.setWebViewClient(new WebViewClient() {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -118,9 +130,9 @@ public class ScrollingActivity extends AppCompatActivity {
 
                 return true;
             }
+
             @Override
-            public void onPageFinished(WebView view, final String url)
-            {
+            public void onPageFinished(WebView view, final String url) {
 
             }
         });
@@ -156,6 +168,8 @@ public class ScrollingActivity extends AppCompatActivity {
                 tmpLink = link_events;          break;
             case R.id.nav_Kleingroepe:
                 tmpLink =  link_kleingroepe;    break;
+            case R.id.nav_Warm_gesprekke:
+                tmpLink = link_warm_gesprekke; break;
             case R.id.nav_Eerstejaarskampe:
                 tmpLink = link_eerstejaarskampe;break;
             case R.id.nav_Inskrywingsvorm:
