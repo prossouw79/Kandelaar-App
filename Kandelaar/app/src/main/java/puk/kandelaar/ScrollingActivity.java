@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,9 +63,23 @@ public class ScrollingActivity extends AppCompatActivity {
         });
 
         webView = (WebView) findViewById(R.id.webView);
+
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_UP:
+                        if (!v.hasFocus()) {
+                            v.requestFocus();
+                        }
+                        break;
+                }
+                return false;
+            }
+        });
         loadWebViewLoad(webView, link_tuis);
     }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
@@ -80,43 +95,29 @@ public class ScrollingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(webView.getUrl().equals(link_tuis))
+        if(webView.canGoBack())
         {
-
+            webView.goBack();
+        }
+        else {
             Intent setIntent = new Intent(Intent.ACTION_MAIN);
             setIntent.addCategory(Intent.CATEGORY_HOME);
             setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(setIntent);
         }
-        else {
-            loadWebViewLoad(webView, link_tuis);
-            Toast.makeText(getBaseContext(), "Druk nog 'n keer om die app toe te maak.",
-                    Toast.LENGTH_LONG).show();
-        }
     }
 
     private void loadWebViewLoad(WebView webview,String url)
     {
-        switch (url) {
-            case link_tuis : {Toast.makeText(getBaseContext(), "Tuis",Toast.LENGTH_SHORT).show(); break;}
-            case link_eredienste : {Toast.makeText(getBaseContext(), "Eredienste",Toast.LENGTH_SHORT).show(); break;}
-            case link_uitreike : {Toast.makeText(getBaseContext(), "Uitreike",Toast.LENGTH_SHORT).show(); break;}
-            case link_events : {Toast.makeText(getBaseContext(), "Events",Toast.LENGTH_SHORT).show(); break;}
-            case link_kleingroepe : {Toast.makeText(getBaseContext(), "Kleingroepe",Toast.LENGTH_SHORT).show(); break;}
-            case link_warm_gesprekke : {Toast.makeText(getBaseContext(), "Warm Gesprekke",Toast.LENGTH_SHORT).show(); break;}
-            case link_eerstejaarskampe : {Toast.makeText(getBaseContext(), "Eerstejaars Kampe",Toast.LENGTH_SHORT).show(); break;}
-            case link_kontak_ons : {Toast.makeText(getBaseContext(), "Kontak Ons",Toast.LENGTH_SHORT).show(); break;}
-
-        }
-
 
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
-
+        webview.getSettings().setAppCacheEnabled(true);
+        webview.getSettings().setUseWideViewPort(true);
         if (!isNetworkAvailable()) {
             webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-            Toast.makeText(getBaseContext(), "Geen internet konneksie!\nDie app hardloop (nog) nie op genade nie!",
+            Toast.makeText(getBaseContext(), "Geen internet konneksie!\n\nOu inligting mag vertoon word!",
                     Toast.LENGTH_LONG).show();
         } else
         {
@@ -127,13 +128,35 @@ public class ScrollingActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
+                view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
 
+                Log.d("CDA", "LINK:" + url);
                 return true;
             }
 
             @Override
             public void onPageFinished(WebView view, final String url) {
+        /*switch (url) {
+            case link_tuis : {Toast.makeText(getBaseContext(), "Tuis",Toast.LENGTH_SHORT).show(); break;}
+            case link_eredienste : {Toast.makeText(getBaseContext(), "Eredienste",Toast.LENGTH_SHORT).show(); break;}
+            case link_uitreike : {Toast.makeText(getBaseContext(), "Uitreike",Toast.LENGTH_SHORT).show(); break;}
+            case link_events : {Toast.makeText(getBaseContext(), "Events",Toast.LENGTH_SHORT).show(); break;}
+            case link_kleingroepe : {Toast.makeText(getBaseContext(), "Kleingroepe",Toast.LENGTH_SHORT).show(); break;}
+            case link_warm_gesprekke : {Toast.makeText(getBaseContext(), "Warm Gesprekke",Toast.LENGTH_SHORT).show(); break;}
+            case link_eerstejaarskampe : {Toast.makeText(getBaseContext(), "Eerstejaars Kampe",Toast.LENGTH_SHORT).show(); break;}
+            case link_kontak_ons : {Toast.makeText(getBaseContext(), "Kontak Ons",Toast.LENGTH_SHORT).show(); break;}
+        }*/
 
+                //view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+
+                view.loadUrl("about:blank");
+                Toast.makeText(getBaseContext(), "Geen internet konneksie!",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
