@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,6 +62,37 @@ public class ScrollingActivity extends AppCompatActivity {
 
         webView = (WebView) findViewById(R.id.webView);
         loadWebViewLoad(webView, link_tuis);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            Log.d("CDA", "onKeyDown Called");
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if(webView.getUrl().equals(link_tuis))
+        {
+
+            Intent setIntent = new Intent(Intent.ACTION_MAIN);
+            setIntent.addCategory(Intent.CATEGORY_HOME);
+            setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(setIntent);
+        }
+        else {
+            loadWebViewLoad(webView, link_tuis);
+
+            Toast.makeText(getBaseContext(), "Druk nog 'n keer om die app toe te maak.",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     private void loadWebViewLoad(WebView webview,String url)
