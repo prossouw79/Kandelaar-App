@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.renderscript.Script;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,7 @@ public class ScrollingActivity extends AppCompatActivity {
     public final String link_kontak_ons = "http://www.ngpukkandelaar.co.za/kontak-ons/";
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +49,8 @@ public class ScrollingActivity extends AppCompatActivity {
         boolean hasHarwareMenu = ViewConfigurationCompat.hasPermanentMenuKey(ViewConfiguration.get(getApplicationContext()));
         if (!hasHarwareMenu) setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab_share = (FloatingActionButton) findViewById(R.id.fab_share);
+        fab_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
@@ -107,7 +110,7 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
 
-    private void loadWebViewLoad(WebView webview,String url)
+    private void loadWebViewLoad(final WebView webview,String url)
     {
 
         webview.getSettings().setJavaScriptEnabled(true);
@@ -115,6 +118,8 @@ public class ScrollingActivity extends AppCompatActivity {
         webview.getSettings().setSupportMultipleWindows(true);
         webview.getSettings().setAppCacheEnabled(true);
         webview.getSettings().setUseWideViewPort(true);
+        webview.getSettings().setLoadWithOverviewMode(true);
+
         if (!isNetworkAvailable()) {
             webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
             Toast.makeText(getBaseContext(), "Geen internet konneksie!\n\nOu inligting mag vertoon word!",
@@ -125,15 +130,23 @@ public class ScrollingActivity extends AppCompatActivity {
         }
         webView.setWebViewClient(new WebViewClient() {
 
+            ProgressDialog pd = ProgressDialog.show(ScrollingActivity.this, "", "Net 'n oomblik...", true);
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon)
+            {
+                if(isNetworkAvailable()) {
+                    pd.show();
+                    webview.setVisibility(View.GONE);
+                }
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
-                view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
 
-                Log.d("CDA", "LINK:" + url);
                 return true;
             }
-
             @Override
             public void onPageFinished(WebView view, final String url) {
         /*switch (url) {
@@ -147,7 +160,12 @@ public class ScrollingActivity extends AppCompatActivity {
             case link_kontak_ons : {Toast.makeText(getBaseContext(), "Kontak Ons",Toast.LENGTH_SHORT).show(); break;}
         }*/
 
-                //view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
+                //hide social buttons and menu
+                view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
+                view.loadUrl("javascript:document.getElementById(\"site-navigation\").setAttribute(\"style\",\"display:none;\");");
+
+                webview.setVisibility(View.VISIBLE);
+                pd.dismiss();
             }
 
             @Override
@@ -162,7 +180,6 @@ public class ScrollingActivity extends AppCompatActivity {
 
         webview.loadUrl(url);
 }
-
     boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
