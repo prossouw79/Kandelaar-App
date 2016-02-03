@@ -30,6 +30,13 @@ import android.webkit.WebViewClient;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+
 public class ScrollingActivity extends AppCompatActivity {
     WebView webView;
 
@@ -45,6 +52,10 @@ public class ScrollingActivity extends AppCompatActivity {
 
     public final String link_ext_youtube = "https://www.youtube.com/user/PukkeKandelaar";
     public final String link_ext_facebook = "https://www.facebook.com/PUK-Kandelaar-336930246395625/timeline/";
+
+
+    private ArrayList<String> linksOnPage = new ArrayList<String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +133,8 @@ public class ScrollingActivity extends AppCompatActivity {
         webview.getSettings().setSupportMultipleWindows(true);
         webview.getSettings().setAppCacheEnabled(true);
         webview.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setAllowFileAccess(true);
+        webView.getSettings().setAppCacheEnabled(true);
         webview.getSettings().setLoadWithOverviewMode(true);
 
         if (!isNetworkAvailable()) {
@@ -142,6 +155,7 @@ public class ScrollingActivity extends AppCompatActivity {
                 }
             }
 
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url.contains("ngpukkandelaar.co.za"))
@@ -159,12 +173,17 @@ public class ScrollingActivity extends AppCompatActivity {
                     }
                     else
                     {
+                        makeLongToast("Youtube is nie op jou toestel nie!\nLaai dit af vir 'n beter ervaring.");
                         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                         startActivity(i);
                     }
                 } else if (url.contains("facebook"))
                 {
                    // makeShortToast("Facebook url");
+                    if(!isAppInstalled("com.facebook.katana")) {
+                        makeLongToast("Facebook is nie op jou toestel nie!\nLaai dit af vir 'n beter ervaring.");
+                    }
+
                     Intent i = newFacebookIntent(ScrollingActivity.this.getPackageManager(),url);
                     startActivity(i);
                 }else
@@ -192,6 +211,30 @@ public class ScrollingActivity extends AppCompatActivity {
                 //hide social buttons and menu
                 // view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
                 //view.loadUrl("javascript:document.getElementById(\"site-navigation\").setAttribute(\"style\",\"display:none;\");");
+
+              /*  try {
+                    Document doc = Jsoup.connect(url).get();
+                    Elements links = doc.select("a[href]");
+
+                    linksOnPage.clear();
+
+                    for (Element link : links) {
+                        String tmp = link.attr("abs:href");
+                        String text = link.text().trim();
+
+                        if(tmp.contains("youtu"))
+                        {
+                            linksOnPage.add(tmp+"###"+text);
+                        }
+                    }
+
+                makeLongToast(String.valueOf(linksOnPage.size()));
+                }
+                catch (Exception ex)
+                {
+
+                }*/
+
 
                 webview.setVisibility(View.VISIBLE);
                 try {
