@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -66,8 +67,7 @@ public class ScrollingActivity extends AppCompatActivity {
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
-                Toast.makeText(getBaseContext(), "Dankie dat jy hierdie app versprei!",
-                        Toast.LENGTH_LONG).show();
+               makeLongToast("Dankie dat jy hierdie app versprei!");
             }
         });
 
@@ -89,8 +89,9 @@ public class ScrollingActivity extends AppCompatActivity {
         });
         loadWebViewLoad(webView, link_tuis);
     }
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -104,11 +105,9 @@ public class ScrollingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(webView.canGoBack())
-        {
+        if (webView.canGoBack()) {
             webView.goBack();
-        }
-        else {
+        } else {
             Intent setIntent = new Intent(Intent.ACTION_MAIN);
             setIntent.addCategory(Intent.CATEGORY_HOME);
             setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -116,8 +115,7 @@ public class ScrollingActivity extends AppCompatActivity {
         }
     }
 
-    private void loadWebViewLoad(final WebView webview,String url)
-    {
+    private void loadWebViewLoad(final WebView webview, String url) {
 
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
@@ -128,10 +126,8 @@ public class ScrollingActivity extends AppCompatActivity {
 
         if (!isNetworkAvailable()) {
             webview.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-            Toast.makeText(getBaseContext(), "Geen internet konneksie!\n\nOu inligting mag vertoon word!",
-                    Toast.LENGTH_LONG).show();
-        } else
-        {
+            makeLongToast("Geen internet konneksie!\n\nOu inligting mag vertoon word!");
+        } else {
             webview.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         }
         webView.setWebViewClient(new WebViewClient() {
@@ -139,9 +135,8 @@ public class ScrollingActivity extends AppCompatActivity {
             ProgressDialog pd = ProgressDialog.show(ScrollingActivity.this, "", "Net 'n oomblik...", true);
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon)
-            {
-                if(isNetworkAvailable()) {
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                if (isNetworkAvailable()) {
                     pd.show();
                     webview.setVisibility(View.GONE);
                 }
@@ -149,10 +144,38 @@ public class ScrollingActivity extends AppCompatActivity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-
+                if (url.contains("ngpukkandelaar.co.za"))
+                {
+                    view.loadUrl(url);
+                    //makeShortToast("Internal URL");
+                } else if (url.contains("youtu"))
+                {
+                    //makeShortToast("Youtube url");
+                    if(isAppInstalled("com.google.android.youtube")) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setPackage("com.google.android.youtube");
+                        intent.setData(Uri.parse(url));
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(i);
+                    }
+                } else if (url.contains("facebook"))
+                {
+                   // makeShortToast("Facebook url");
+                    Intent i = newFacebookIntent(ScrollingActivity.this.getPackageManager(),url);
+                    startActivity(i);
+                }else
+                {
+                   // makeShortToast("External url");
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(i);
+                }
                 return true;
             }
+
             @Override
             public void onPageFinished(WebView view, final String url) {
         /*switch (url) {
@@ -167,18 +190,15 @@ public class ScrollingActivity extends AppCompatActivity {
         }*/
 
                 //hide social buttons and menu
-               // view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
+                // view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
                 //view.loadUrl("javascript:document.getElementById(\"site-navigation\").setAttribute(\"style\",\"display:none;\");");
 
                 webview.setVisibility(View.VISIBLE);
-                try{
+                try {
                     pd.dismiss();
+                } catch (java.lang.IllegalArgumentException ex) {
+                    Log.d("EXC", "Exception caught\n" + ex.getMessage());
                 }
-                catch (java.lang.IllegalArgumentException ex)
-                {
-                    Log.d("EXC","Exception caught\n" + ex.getMessage());
-                }
-
             }
 
             @Override
@@ -192,85 +212,44 @@ public class ScrollingActivity extends AppCompatActivity {
         });
 
         webview.loadUrl(url);
-}
+    }
+
     boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
+    public void makeShortToast(String msg)
+    {
+        Toast.makeText(getBaseContext(), msg,
+                Toast.LENGTH_SHORT).show();
+    }
 
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.menu_scrolling, menu);
+    public void makeLongToast(String msg)
+    {
+        Toast.makeText(getBaseContext(), msg,
+                Toast.LENGTH_LONG).show();
+    }
+
+    public boolean isAppInstalled(String packageName) {
+        Intent mIntent = getPackageManager().getLaunchIntentForPackage(packageName);
+        if (mIntent != null) {
             return true;
-
-    }*/
-
-  /*  @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        String tmpLink = link_tuis;
-        String currentUrl = webView.getUrl();
-
-        switch (item.getItemId()) {
-            case R.id.nav_Tuis:
-                tmpLink = link_tuis;            break;
-            case R.id.nav_Eredienste:
-                tmpLink =  link_eredienste;     break;
-            case R.id.nav_Uitreike:
-                tmpLink = link_uitreike;        break;
-            case R.id.nav_Events:
-                tmpLink = link_events;          break;
-            case R.id.nav_Kleingroepe:
-                tmpLink =  link_kleingroepe;    break;
-            case R.id.nav_Warm_gesprekke:
-                tmpLink = link_warm_gesprekke; break;
-            case R.id.nav_Eerstejaarskampe:
-                tmpLink = link_eerstejaarskampe;break;
-            case R.id.nav_Inskrywingsvorm:
-                tmpLink =  link_inskrywingsvorm;break;
-            case R.id.nav_Kontak_Ons:
-                tmpLink = link_kontak_ons;      break;
-         /*   case R.id.nav_Youtube: {
-                Intent intent=null;
-                try {
-                    intent =new Intent(Intent.ACTION_VIEW);
-                    intent.setPackage("com.google.android.youtube");
-                    intent.setData(Uri.parse(link_ext_youtube));
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(link_ext_youtube));
-                    startActivity(intent);
-                }*/
-            }
-
-          /*  case R.id.nav_Facebook: {
-                Intent intent=null;
-                try {
-                    intent =new Intent(Intent.ACTION_VIEW);
-                    intent.setPackage("com.google.android.youtube");
-                    intent.setData(Uri.parse(link_ext_youtube));
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(link_ext_youtube));
-                    startActivity(intent);
-                }
-            }
-
-        if(tmpLink!=currentUrl)
-            loadWebViewLoad(webView,tmpLink);
-        return super.onOptionsItemSelected(item);
-    }*/
-
-   /* public static Intent getOpenFacebookIntent(Context context) {
-
-        try {
-            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
-            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/<id_here>"));
-        } catch (Exception e) {
-            return new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/<user_name_here>"));
         }
-    }*/
+        else {
+            return false;
+        }
+    }
 
+    public static Intent newFacebookIntent(PackageManager pm, String url) {
+        Uri uri;
+        try {
+            pm.getPackageInfo("com.facebook.katana", 0);
+            // http://stackoverflow.com/a/24547437/1048340
+            uri = Uri.parse("fb://facewebmodal/f?href=" + url);
+        } catch (PackageManager.NameNotFoundException e) {
+            uri = Uri.parse(url);
+        }
+        return new Intent(Intent.ACTION_VIEW, uri);
+    }
+}
