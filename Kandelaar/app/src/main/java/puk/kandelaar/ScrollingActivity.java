@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.renderscript.Script;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewConfigurationCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,10 +26,12 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class ScrollingActivity extends AppCompatActivity {
     WebView webView;
+
     public final String link_tuis = "http://www.ngpukkandelaar.co.za/tuis/";
     public final String link_eredienste = "http://www.ngpukkandelaar.co.za/eredienste/";
     public final String link_uitreike = "http://www.ngpukkandelaar.co.za/uitreike/";
@@ -164,11 +167,18 @@ public class ScrollingActivity extends AppCompatActivity {
         }*/
 
                 //hide social buttons and menu
-                view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
-                view.loadUrl("javascript:document.getElementById(\"site-navigation\").setAttribute(\"style\",\"display:none;\");");
+               // view.loadUrl("javascript:document.getElementById(\"social_icons\").setAttribute(\"style\",\"display:none;\");");
+                //view.loadUrl("javascript:document.getElementById(\"site-navigation\").setAttribute(\"style\",\"display:none;\");");
 
                 webview.setVisibility(View.VISIBLE);
-                pd.dismiss();
+                try{
+                    pd.dismiss();
+                }
+                catch (java.lang.IllegalArgumentException ex)
+                {
+                    Log.d("EXC","Exception caught\n" + ex.getMessage());
+                }
+
             }
 
             @Override
@@ -201,6 +211,7 @@ public class ScrollingActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String tmpLink = link_tuis;
         String currentUrl = webView.getUrl();
+
         switch (item.getItemId()) {
             case R.id.nav_Tuis:
                 tmpLink = link_tuis;            break;
@@ -220,7 +231,7 @@ public class ScrollingActivity extends AppCompatActivity {
                 tmpLink =  link_inskrywingsvorm;break;
             case R.id.nav_Kontak_Ons:
                 tmpLink = link_kontak_ons;      break;
-            case R.id.nav_Youtube: {
+         /*   case R.id.nav_Youtube: {
                 Intent intent=null;
                 try {
                     intent =new Intent(Intent.ACTION_VIEW);
@@ -231,7 +242,7 @@ public class ScrollingActivity extends AppCompatActivity {
                     intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(link_ext_youtube));
                     startActivity(intent);
-                }
+                }*/
             }
 
           /*  case R.id.nav_Facebook: {
@@ -247,7 +258,7 @@ public class ScrollingActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             }*/
-        }
+
         if(tmpLink!=currentUrl)
             loadWebViewLoad(webView,tmpLink);
         return super.onOptionsItemSelected(item);
