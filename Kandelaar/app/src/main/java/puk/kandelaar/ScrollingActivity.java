@@ -199,15 +199,15 @@ public class ScrollingActivity extends AppCompatActivity {
     }
 
 
-    @Override
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.menu_scrolling, menu);
             return true;
 
-    }
+    }*/
 
-    @Override
+  /*  @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String tmpLink = link_tuis;
         String currentUrl = webView.getUrl();
@@ -257,12 +257,12 @@ public class ScrollingActivity extends AppCompatActivity {
                     intent.setData(Uri.parse(link_ext_youtube));
                     startActivity(intent);
                 }
-            }*/
+            }
 
         if(tmpLink!=currentUrl)
             loadWebViewLoad(webView,tmpLink);
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
    /* public static Intent getOpenFacebookIntent(Context context) {
 
@@ -273,4 +273,4 @@ public class ScrollingActivity extends AppCompatActivity {
             return new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/<user_name_here>"));
         }
     }*/
-}
+
